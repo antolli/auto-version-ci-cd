@@ -1,0 +1,23 @@
+name: Auto Versioning
+on:
+  push:
+    branches:
+      - main
+jobs:
+  auto-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Increment version
+        run: |
+          version=$(cat version.txt)
+          IFS='.' read -ra PARTS <<< "${version//v}"
+          ((PARTS[2]++))
+          new_version="v${PARTS[0]}.${PARTS[1]}.${PARTS[2]}"
+          echo $new_version > version.txt
+      - name: Commit and push
+        run: |
+          git config --global user.name 'CI Bot'
+          git config --global user.email 'ci@example.com'
+          git commit -am "Increment version"
+          git push origin main
